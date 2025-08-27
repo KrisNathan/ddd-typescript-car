@@ -1,15 +1,16 @@
-import APIRoutes from "@infrastructure/routes/api_routes.js";
+import OpenAPIRoutes from "@infrastructure/routes/openapi_routes.js";
 import HTTPServerAdapter from "./infrastructure/adapters/http_server.js";
 
 const server = HTTPServerAdapter.init();
 
-server.get("/", async (req) => {
-  return {
-    status: 200,
-    body: "Hello, World!",
-  };
+server.getApp().get("/", async (c) => {
+  return c.json({
+    message: "Welcome to Car Sales API!",
+    docs: "Visit /doc for OpenAPI documentation",
+    ui: "Visit /ui for Swagger UI"
+  });
 });
 
-const routes = new APIRoutes(server)
+const routes = new OpenAPIRoutes(server)
 routes.setup();
 

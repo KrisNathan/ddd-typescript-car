@@ -1,12 +1,6 @@
 import type RegisterCustomerUseCase from "@/application/use_cases/register_customer"
 import type { HTTPRequest, HTTPResponse } from "../adapters/http_server"
-import z from "zod";
 import type ListAllCustomersUseCase from "@application/use_cases/list_all_customers";
-
-const RegisterCustomerSchema = z.object({
-  name: z.string().min(1).max(512),
-  email: z.string().email(),
-});
 
 export default class CustomerController {
   constructor(
@@ -16,17 +10,8 @@ export default class CustomerController {
 
   registerCustomer = async (req: HTTPRequest): Promise<HTTPResponse> => {
     try {
-      const parseResult = RegisterCustomerSchema.safeParse(req.body);
-      if (!parseResult.success) {
-        return {
-          status: 400, body: {
-            message: "Invalid request body",
-            errors: parseResult.error.message,
-          },
-        }
-      }
-
-      const { name, email } = parseResult.data;
+      const { name, email } = req.body as { name: string; email: string };
+      
       const customerId = await this.registerCustomerUseCase.execute(name, email);
 
       return {

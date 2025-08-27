@@ -1,5 +1,6 @@
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { swaggerUI } from "@hono/swagger-ui";
 
 enum HTTPStatus {
   OK = 200,
@@ -25,11 +26,35 @@ export interface HTTPRequest {
 export type HTTPHandler = (req: HTTPRequest) => Promise<HTTPResponse> | HTTPResponse;
 
 export default class HTTPServerAdapter {
-  constructor(private app: Hono) { }
+  constructor(private app: OpenAPIHono) { }
+  
   static init() {
-    const app = new Hono();
+    const app = new OpenAPIHono();
+
+    // Setup OpenAPI documentation
+    app.doc('/doc', {
+      openapi: '3.0.0',
+      info: {
+        version: '1.0.0',
+        title: 'Car Sales API',
+        description: 'API for managing car sales, customers, sales persons, and cars',
+      },
+      servers: [
+        {
+          url: 'http://localhost:3000',
+          description: 'Development server',
+        },
+      ],
+    });
+
+    // Setup Swagger UI
+    app.get('/ui', swaggerUI({ url: '/doc' }));
 
     return new HTTPServerAdapter(app);
+  }
+
+  getApp() {
+    return this.app;
   }
 
   get(path: string, handler: HTTPHandler) {
