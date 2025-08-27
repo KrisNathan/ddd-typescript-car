@@ -8,12 +8,13 @@ export default class CarController {
   registerCar = async (req: HTTPRequest): Promise<HTTPResponse> => {
     try {
       const { make, model, year } = req.body as { make: string; model: string; year: number };
-      
-      await this.registerCarUseCase.execute(make, model, year);
+
+      const carId = await this.registerCarUseCase.execute(make, model, year);
 
       return {
         status: 200, body: {
           message: "Car created successfully",
+          carId: carId.toString(),
         },
       }
     } catch (error) {
