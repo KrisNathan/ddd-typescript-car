@@ -9,7 +9,7 @@ Toyota
 Toyota
 
 
-Also no black magic allowed (decorators)
+Also no magic allowed (decorators)
 - They don't exist in many languages
 - They hide things that probably shouldnt be hidden in the first place
 
