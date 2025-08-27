@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "outDir": "./dist",
+    "baseUrl": ".", // This sets the base directory for resolving non-relative module names.
+      "paths": {
+        "@shared/*": ["src/shared/*"], // This maps "@shared/" to the "src/shared/" directory.
+        "@domain/*": ["src/domain/*"], // This maps "@domain/" to the "src/domain/" directory.
+        "@application/*": ["src/application/*"], // This maps "@application/" to the "src/application/" directory.
+        "@infrastructure/*": ["src/infrastructure/*"], // This maps "@infrastructure/"
+        "@/*": ["src/*"] // This maps "@src/" to the "src/" directory.
+      }
+  },
+  "exclude": ["node_modules"]
+}

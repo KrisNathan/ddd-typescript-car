@@ -1,0 +1,1 @@
+ALTER TABLE "car_sales" ADD COLUMN "negotiated_price_currency" varchar(3) DEFAULT 'USD' NOT NULL;

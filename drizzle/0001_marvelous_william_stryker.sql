@@ -1,0 +1,1 @@
+ALTER TABLE "car_sales" RENAME COLUMN "sale_date" TO "transaction_date";
