@@ -22,3 +22,8 @@ npm run dev
 ```
 open http://localhost:3000
 ```
+
+OpenAPI:
+
+- OpenAPI documentation available at /doc
+- Swagger UI available at /ui
