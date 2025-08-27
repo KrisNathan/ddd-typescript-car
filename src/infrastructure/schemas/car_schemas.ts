@@ -38,6 +38,9 @@ export const CarResponseSchema = z.object({
   message: z.string().openapi({
     example: 'Car created successfully'
   }),
+  carId: z.string().openapi({
+    example: '123e4567-e89b-12d3-a456-426614174000'
+  }),
 }).openapi('CarResponse');
 
 export const CarsListSchema = z.object({

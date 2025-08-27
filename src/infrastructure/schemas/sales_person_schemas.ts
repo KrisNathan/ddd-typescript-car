@@ -20,9 +20,9 @@ export const SalesPersonSchema = z.object({
     example: 'Jane Smith',
     description: 'Sales person full name'
   }),
-  email: z.string().email().openapi({
-    example: 'jane.smith@company.com',
-    description: 'Sales person email address'
+  carsSoldCount: z.number().openapi({
+    example: 25,
+    description: 'Number of cars sold by the sales person'
   }),
 }).openapi('SalesPerson');
 

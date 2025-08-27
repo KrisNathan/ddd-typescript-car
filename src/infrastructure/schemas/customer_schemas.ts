@@ -24,6 +24,10 @@ export const CustomerSchema = z.object({
     example: 'john.doe@example.com',
     description: 'Customer email address'
   }),
+  loyaltyPoints: z.number().openapi({
+    example: 150,
+    description: 'Customer loyalty points'
+  }),
 }).openapi('Customer');
 
 export const CustomerResponseSchema = z.object({

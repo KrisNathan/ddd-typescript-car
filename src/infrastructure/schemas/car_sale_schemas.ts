@@ -36,13 +36,19 @@ export const CarSaleSchema = z.object({
     example: '123e4567-e89b-12d3-a456-426614174000',
     description: 'Sales person unique identifier'
   }),
-  price: z.number().openapi({
-    example: 25000.00,
-    description: 'Sale price'
-  }),
-  saleDate: z.string().datetime().openapi({
+  transactionDate: z.string().datetime().openapi({
     example: '2023-12-01T10:00:00Z',
-    description: 'Sale date and time'
+    description: 'Transaction date and time'
+  }),
+  negotiatedPrice: z.object({
+    amount: z.number().positive().openapi({
+      example: 25000.00,
+      description: 'Negotiated sale price'
+    }),
+    currency: z.string().length(3).openapi({
+      example: 'USD',
+      description: 'Currency code in ISO 4217 format'
+    })
   }),
 }).openapi('CarSale');
 
