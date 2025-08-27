@@ -1,6 +1,7 @@
 import type ListAllSalesPersonsUseCase from "@application/use_cases/list_all_sales_persons";
 import type { HTTPRequest, HTTPResponse } from "../adapters/http_server";
 import type RegisterSalesPersonUseCase from "@application/use_cases/register_sales_person";
+import { salesPersonToDTO } from "@infrastructure/dto/sales_person";
 
 export default class SalesPersonController {
   constructor(
@@ -11,8 +12,8 @@ export default class SalesPersonController {
   registerSalesPerson = async (req: HTTPRequest): Promise<HTTPResponse> => {
     try {
       const { name } = req.body as { name: string; email: string };
-      
-      const salesPersonId= await this.registerSalesPersonUseCase.execute(name);
+
+      const salesPersonId = await this.registerSalesPersonUseCase.execute(name);
 
       return {
         status: 200, body: {
@@ -31,7 +32,8 @@ export default class SalesPersonController {
 
   listAllSalesPersons = async (_req: HTTPRequest): Promise<HTTPResponse> => {
     try {
-      const salesPersons = await this.listAllSalesPersonUseCase.execute();
+      const salesPersons = (await this.listAllSalesPersonUseCase.execute()).map(salesPerson => salesPersonToDTO(salesPerson));
+
       return {
         status: 200, body: { salesPersons },
       }

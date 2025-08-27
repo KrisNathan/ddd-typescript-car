@@ -1,6 +1,7 @@
 import type RegisterCarSaleUseCase from "@/application/use_cases/register_car_sale";
 import type ListAllCarSaleUseCase from "@application/use_cases/list_all_car_sales";
 import type { HTTPRequest, HTTPResponse } from "@infrastructure/adapters/http_server";
+import { carSaleToDTO } from "@infrastructure/dto/car_sale";
 
 // NOTE: use arrow functions to auto-bind `this` in methods
 
@@ -12,11 +13,11 @@ export default class CarSaleController {
 
   registerCarSale = async (req: HTTPRequest): Promise<HTTPResponse> => {
     try {
-      const { carId, customerId, salesPersonId, price } = req.body as { 
-        carId: string; 
-        customerId: string; 
-        salesPersonId: string; 
-        price: number; 
+      const { carId, customerId, salesPersonId, price } = req.body as {
+        carId: string;
+        customerId: string;
+        salesPersonId: string;
+        price: number;
       };
 
       const carSaleId = await this.registerCarSaleUseCase.execute({
@@ -44,7 +45,7 @@ export default class CarSaleController {
 
   listAllCarSale = async (req: HTTPRequest): Promise<HTTPResponse> => {
     try {
-      const sales = await this.listAllCarSaleUseCase.execute();
+      const sales = (await this.listAllCarSaleUseCase.execute()).map(carSale => carSaleToDTO(carSale));
 
       return {
         status: 200, body: { carSales: sales },

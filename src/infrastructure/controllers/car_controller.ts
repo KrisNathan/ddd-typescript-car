@@ -1,6 +1,7 @@
 import type ListAllCarsUseCase from "@application/use_cases/list_all_cars";
 import type RegisterCarUseCase from "@application/use_cases/register_car";
 import type { HTTPRequest, HTTPResponse } from "@infrastructure/adapters/http_server";
+import { carToDTO } from "@infrastructure/dto/car";
 
 export default class CarController {
   constructor(private readonly registerCarUseCase: RegisterCarUseCase, private readonly listAllCarsUseCase: ListAllCarsUseCase) { }
@@ -28,7 +29,8 @@ export default class CarController {
 
   listAllCars = async (req: HTTPRequest): Promise<HTTPResponse> => {
     try {
-      const cars = await this.listAllCarsUseCase.execute();
+      const cars = (await this.listAllCarsUseCase.execute()).map(car => carToDTO(car));
+      
       return {
         status: 200, body: { cars },
       }
