@@ -149,8 +149,14 @@ export default class OpenAPIRoutes {
     });
 
     // Car Sale routes
-    const registerCarSaleUseCase = new RegisterCarSaleUseCase(compositionRoot.unitOfWork, compositionRoot.carSaleService);
-    const listAllCarSalesUseCase = new ListAllCarSalesUseCase(compositionRoot.carSaleService);
+    const registerCarSaleUseCase = new RegisterCarSaleUseCase(
+      compositionRoot.unitOfWork,
+      compositionRoot.carSaleServiceFactory,
+    );
+    const listAllCarSalesUseCase = new ListAllCarSalesUseCase(
+      compositionRoot.unitOfWork,
+      compositionRoot.carSaleServiceFactory,
+    );
     const carSaleController = new CarSaleController(registerCarSaleUseCase, listAllCarSalesUseCase);
 
     app.openapi(registerCarSaleRoute, async (c) => {

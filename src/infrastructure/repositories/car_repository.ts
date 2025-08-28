@@ -1,16 +1,15 @@
 import type ICarRepository from "@/domain/repositories/car_repository";
 import Car from "@domain/entities/car";
-import type { Database, DatabaseOrTransaction } from "../database/types";
+import type { DatabaseOrTransaction } from "../database/types";
 import { cars } from "../database/schema";
 import UUID from "@/domain/values/uuid";
 import { eq } from "drizzle-orm";
 
 export default class CarRepository implements ICarRepository {
-  constructor(private readonly db: Database) { }
+  constructor(private readonly db: DatabaseOrTransaction) { }
 
-  async addCar(car: Car, tx?: DatabaseOrTransaction): Promise<UUID> {
-    const dbConnection = tx ?? this.db;
-    const result = await dbConnection.insert(cars).values({
+  async addCar(car: Car): Promise<UUID> {
+    const result = await this.db.insert(cars).values({
       id: car.id.toString(),
       make: car.make,
       model: car.model,
@@ -20,9 +19,8 @@ export default class CarRepository implements ICarRepository {
     return new UUID(result[0].id);
   }
 
-  async getCars(tx?: DatabaseOrTransaction): Promise<Car[]> {
-    const dbConnection = tx ?? this.db;
-    const rows = await dbConnection.select().from(cars);
+  async getCars(): Promise<Car[]> {
+    const rows = await this.db.select().from(cars);
     return rows.map(row => new Car({
       id: new UUID(row.id),
       make: row.make,
@@ -31,9 +29,8 @@ export default class CarRepository implements ICarRepository {
     }));
   }
 
-  async getCarById(id: UUID, tx?: DatabaseOrTransaction): Promise<Car | null> {
-    const dbConnection = tx ?? this.db;
-    const row = await dbConnection.select().from(cars).where(eq(cars.id, id.toString())).limit(1);
+  async getCarById(id: UUID): Promise<Car | null> {
+    const row = await this.db.select().from(cars).where(eq(cars.id, id.toString())).limit(1);
     if (row.length === 0) {
       return null;
     }

@@ -1,19 +1,17 @@
 import type ICustomerRepository from "@/domain/repositories/customer_repository";
 import Customer from "@/domain/entities/customer";
 import UUID from "@/domain/values/uuid";
-import type { Database, DatabaseOrTransaction } from "../database/types";
+import type { DatabaseOrTransaction } from "../database/types";
 import { customers } from "../database/schema";
 import PeopleName from "@/domain/values/people_name";
 import Email from "@/domain/values/email";
 import { eq } from "drizzle-orm";
 
 export default class CustomerRepository implements ICustomerRepository {
-  constructor(private readonly db: Database) { }
+  constructor(private readonly db: DatabaseOrTransaction) { }
 
-  async addCustomer(customer: Customer, tx?: DatabaseOrTransaction): Promise<UUID> {
-    const dbConnection = tx ?? this.db;
-
-    const result = await dbConnection.insert(customers).values({
+  async addCustomer(customer: Customer): Promise<UUID> {
+    const result = await this.db.insert(customers).values({
       id: customer.id.toString(),
       name: customer.name.toString(),
       email: customer.email.toString(),
@@ -23,10 +21,8 @@ export default class CustomerRepository implements ICustomerRepository {
     return new UUID(result[0].id);
   }
 
-  async getAllCustomers(tx?: DatabaseOrTransaction): Promise<Customer[]> {
-    const dbConnection = tx ?? this.db;
-
-    const rows = await dbConnection.select().from(customers);
+  async getAllCustomers(): Promise<Customer[]> {
+    const rows = await this.db.select().from(customers);
     return rows.map(row => new Customer({
       id: new UUID(row.id),
       name: new PeopleName(row.name),
@@ -35,9 +31,8 @@ export default class CustomerRepository implements ICustomerRepository {
     }));
   }
 
-  async getCustomerById(id: UUID, tx?: DatabaseOrTransaction): Promise<Customer | null> {
-    const dbConnection = tx ?? this.db;
-    const row = await dbConnection.select().from(customers).where(eq(customers.id, id.toString())).limit(1);
+  async getCustomerById(id: UUID): Promise<Customer | null> {
+    const row = await this.db.select().from(customers).where(eq(customers.id, id.toString())).limit(1);
     if (!row) {
       return null;
     }
@@ -50,9 +45,8 @@ export default class CustomerRepository implements ICustomerRepository {
     });
   }
 
-  async updateCustomer(customer: Customer, tx?: DatabaseOrTransaction): Promise<void> {
-    const dbConnection = tx ?? this.db;
-    await dbConnection.update(customers).set({
+  async updateCustomer(customer: Customer): Promise<void> {
+    await this.db.update(customers).set({
       name: customer.name.toString(),
       email: customer.email.toString(),
       loyaltyPoints: customer.loyaltyPoints,

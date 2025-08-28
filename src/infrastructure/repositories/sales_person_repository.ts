@@ -1,4 +1,4 @@
-import type { Database, DatabaseOrTransaction } from '../database/types';
+import type { DatabaseOrTransaction } from '../database/types';
 import type ISalesPersonRepository from '@/domain/repositories/sales_person_repository';
 import SalesPerson from '@/domain/entities/sales_person';
 import { salesPersons } from '../database/schema';
@@ -7,11 +7,10 @@ import PeopleName from '@/domain/values/people_name';
 import { eq } from 'drizzle-orm';
 
 export default class SalesPersonRepository implements ISalesPersonRepository {
-  constructor(private readonly db: Database) { }
+  constructor(private readonly db: DatabaseOrTransaction) { }
 
-  async addSalesPerson(salesPerson: SalesPerson, tx?: DatabaseOrTransaction): Promise<UUID> {
-    const dbConnection = tx ?? this.db;
-    const result = await dbConnection.insert(salesPersons).values({
+  async addSalesPerson(salesPerson: SalesPerson): Promise<UUID> {
+    const result = await this.db.insert(salesPersons).values({
       id: salesPerson.id.toString(),
       name: salesPerson.name.toString(),
       carsSoldCount: salesPerson.carsSoldCount,
@@ -20,9 +19,8 @@ export default class SalesPersonRepository implements ISalesPersonRepository {
     return new UUID(result[0].id);
   }
 
-  async getAllSalesPersons(tx?: DatabaseOrTransaction): Promise<SalesPerson[]> {
-    const dbConnection = tx ?? this.db;
-    const rows = await dbConnection.select().from(salesPersons);
+  async getAllSalesPersons(): Promise<SalesPerson[]> {
+    const rows = await this.db.select().from(salesPersons);
     return rows.map(row => new SalesPerson({
       id: new UUID(row.id),
       name: new PeopleName(row.name),
@@ -30,9 +28,8 @@ export default class SalesPersonRepository implements ISalesPersonRepository {
     }));
   }
 
-  async getSalesPersonById(id: UUID, tx?: DatabaseOrTransaction): Promise<SalesPerson | null> {
-    const dbConnection = tx ?? this.db;
-    const row = await dbConnection.select().from(salesPersons).where(eq(salesPersons.id, id.toString())).limit(1);
+  async getSalesPersonById(id: UUID ): Promise<SalesPerson | null> {
+    const row = await this.db.select().from(salesPersons).where(eq(salesPersons.id, id.toString())).limit(1);
     if (row.length === 0) {
       return null;
     }
@@ -44,9 +41,8 @@ export default class SalesPersonRepository implements ISalesPersonRepository {
     });
   }
 
-  async updateSalesPerson(salesPerson: SalesPerson, tx?: DatabaseOrTransaction): Promise<void> {
-    const dbConnection = tx ?? this.db;
-    await dbConnection.update(salesPersons).set({
+  async updateSalesPerson(salesPerson: SalesPerson, ): Promise<void> {
+    await this.db.update(salesPersons).set({
       name: salesPerson.name.toString(),
       carsSoldCount: salesPerson.carsSoldCount,
     }).where(eq(salesPersons.id, salesPerson.id.toString()));

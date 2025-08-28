@@ -1,11 +1,8 @@
-import type { IUnitOfWork } from "@domain/ports/unit_of_work";
-import type ICarRepository from "@domain/repositories/car_repository";
-import type ICarSaleRepository from "@domain/repositories/car_sale_repository";
-import type ICustomerRepository from "@domain/repositories/customer_repository";
-import type ISalesPersonRepository from "@domain/repositories/sales_person_repository";
+import type { IUnitOfWork } from "@application/unit_of_work";
 import CarSaleService from "@domain/services/car_sale_service";
 import Money from "@domain/values/money";
 import UUID from "@domain/values/uuid";
+import type ICarSaleServiceFactory from "@application/factories/car_sale_service_factory";
 
 export interface RegisterCarSaleUseCaseParams {
   customerId: string;
@@ -18,15 +15,18 @@ export interface RegisterCarSaleUseCaseParams {
 export default class RegisterCarSaleUseCase {
   constructor(
     private readonly unitOfWork: IUnitOfWork,
-    private readonly carSaleService: CarSaleService,
+    private readonly carSaleServiceFactory: ICarSaleServiceFactory,
   ) { }
   async execute({ customerId, salesPersonId, carId, negotiatedPriceAmount, negotiatedPriceCurrency }: RegisterCarSaleUseCaseParams): Promise<UUID> {
-    // Business logic to purchase a car
-    return await this.carSaleService.purchaseCar({
-      salesPersonId: new UUID(salesPersonId),
-      customerId: new UUID(customerId),
-      carId: new UUID(carId),
-      negotiatedPrice: new Money(negotiatedPriceAmount, negotiatedPriceCurrency),
+    return await this.unitOfWork.withTransaction(async ({ repositoryProvider }) => {
+      // Business logic to purchase a car
+      const carSaleService: CarSaleService = this.carSaleServiceFactory.create(repositoryProvider);
+      return await carSaleService.purchaseCar({
+        salesPersonId: new UUID(salesPersonId),
+        customerId: new UUID(customerId),
+        carId: new UUID(carId),
+        negotiatedPrice: new Money(negotiatedPriceAmount, negotiatedPriceCurrency),
+      });
     });
   }
 }
